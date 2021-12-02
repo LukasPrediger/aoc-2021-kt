@@ -1,0 +1,18 @@
+
+fun main() {
+    fun part1(input: List<String>): Int {
+        return input.size
+    }
+
+    fun part2(input: List<String>): Int {
+        return input.size
+    }
+
+    val test_input = readInput("DayX_test")
+    check(part1(test_input) == 7)
+    check(part2(test_input) == 5)
+
+    val input = readInput("DayX")
+    println(part1(input))
+    println(part2(input))
+}
