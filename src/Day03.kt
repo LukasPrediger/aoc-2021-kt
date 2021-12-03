@@ -15,12 +15,43 @@ fun main() {
         }.let { it.first * it.second }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        var inputNumbers = input.map { it.toInt(2) }
+
+        var pos = input.first().length - 1
+        while (inputNumbers.size != 1) {
+            val mostSignificant = inputNumbers
+                .map { it.getBit(pos) }
+                .groupingBy { it }
+                .eachCount().entries.sortedByDescending { it.key }
+                .maxByOrNull { it.value }!!.key
+
+            inputNumbers = inputNumbers.filter { it.getBit(pos) == mostSignificant }
+            pos -= 1;
+        }
+        val oxygenGeneratorRating = inputNumbers.first()
+
+        inputNumbers = input.map { it.toInt(2) }
+
+        pos = input.first().length - 1
+        while (inputNumbers.size != 1) {
+            val mostSignificant = inputNumbers
+                .map { it.getBit(pos) }
+                .groupingBy { it }
+                .eachCount().entries.sortedBy { it.key }
+                .minByOrNull { it.value }!!.key
+
+            inputNumbers = inputNumbers.filter { it.getBit(pos) == mostSignificant }
+            pos -= 1;
+        }
+
+        val coTwoScrubber = inputNumbers.first()
+
+        return oxygenGeneratorRating * coTwoScrubber
     }
 
     val test_input = readInput("Day03_test")
     check(part1(test_input) == 198)
-//    check(part2(test_input) == 5)
+    check(part2(test_input) == 230)
 
     val input = readInput("Day03")
     println(part1(input))
