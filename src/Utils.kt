@@ -15,3 +15,5 @@ fun String.md5(): String = BigInteger(1, MessageDigest.getInstance("MD5").digest
 fun Int.getBit(position: Int): Int = (this shr position) and 1
 
 fun Int.setBit(position: Int, value: Int) = (value shl position) or this
+
+fun String.splitCsv(): List<Int> = this.split(',').map(String::toInt)
