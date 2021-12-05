@@ -20,7 +20,7 @@ val outputFile = File("src/Day$dayPadded.kt")
 println("Writing template to ${outputFile.path}")
 
 if (outputFile.exists()) {
-    println("File ${outputFile.path} already exists. Skipping...")
+    println("Code file ${outputFile.path} already exists. Skipping...")
 } else {
     val codeFileText = File("src/setup/DayX.kt.template").readText()
         .replace("DayX", "Day$dayPadded")
@@ -32,9 +32,10 @@ if (outputFile.exists()) {
 println()
 println("Download input")
 val inputFilePath = "src/Day${dayPadded}.txt"
+val testFilePath = "src/Day${dayPadded}_test.txt"
 
 if (File(inputFilePath).exists()) {
-    println("File $inputFilePath already exists. Skipping...")
+    println("Input file $inputFilePath already exists. Skipping...")
 } else {
     ProcessBuilder(
         "aoc",
@@ -47,3 +48,12 @@ if (File(inputFilePath).exists()) {
         .redirectError(ProcessBuilder.Redirect.INHERIT)
         .start().waitFor(1, TimeUnit.MINUTES)
 }
+
+if (!File(testFilePath).createNewFile()) {
+    println("Test file $inputFilePath already exists. Skipping...")
+}
+
+ProcessBuilder(
+    "google-chrome",
+    "https://adventofcode.com/2021/day/${day}"
+).start()
