@@ -33,12 +33,41 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val drawnNumbers = input.first().split(',').map(String::toInt)
+
+        val boards = input.subList(1, input.size).asSequence().filter(String::isNotBlank).chunked(5).map { row ->
+            row.map {
+                it.trim().replace(Regex(" +"), ",").split(',').map(String::toInt)
+            }
+        }.map { board ->
+            // add columns as additional rows
+            board.toMutableList() + (board.indices).map { column -> board.map { it[column] } }
+        }.map { board ->
+            board
+                // Calculate index of each cell in the drawn numbers
+                .map { row -> row.map { drawnNumbers.indexOf(it) to it } }
+                // get highest index of each row
+                .map { it.maxByOrNull { cell -> cell.first }!!.first to it }.let {
+                    // get lowest index per board
+                    it.minByOrNull { row -> row.first }!!.first to it.map { row -> row.second }
+                }
+        }.toList()
+
+        val (loosingIndex, loosingBoard) = boards.maxByOrNull { it.first }!!
+
+        val unmarkedSum = loosingBoard.asSequence().flatten()
+            // Get all numbers which would be marked later then our looser
+            .filter { it.first > loosingIndex }
+            // Remove duplicate rows from turning columns into additional rows
+            .map { it.second }.toSet()
+            .sum()
+
+        return unmarkedSum * drawnNumbers[loosingIndex]
     }
 
     val test_input = readInput("Day04_test")
     check(part1(test_input) == 4512)
-//    check(part2(test_input) == 5)
+    check(part2(test_input) == 1924)
 
     val input = readInput("Day04")
     println(part1(input))
