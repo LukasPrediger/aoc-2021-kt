@@ -1,40 +1,40 @@
-import java.util.concurrent.ForkJoinPool
-import kotlin.streams.toList
+data class FishGroup(
+    var timer: Int,
+    val size: Long
+)
 
 fun main() {
     fun list(fish: List<Int>) = fish
 
-    fun simulate(initialState: List<Int>, days: Int): Int {
-        var fish = initialState
+    fun simulate(initialState: List<Int>, days: Int): Long {
+        var fish = initialState.groupingBy { it }.eachCount().map { FishGroup(it.key, it.value.toLong()) }
 
-        val executorService = ForkJoinPool.commonPool()
+        (1 until days).map { _ ->
+            fish.forEach { it.timer -= 1 }
 
-        (1..days).map {
-            println(it)
-            fish = fish.flatMap {
-                val newFish = mutableListOf(it)
-                if (newFish.first() == 0) {
-                    newFish[0] = 7
-                    newFish.add(9)
-                }
-                newFish
-            }.map { it - 1 }.toList()
+            val (reproduceGroups, otherGroups) = fish.partition { it.timer == 0 }
+
+            val newGroups = reproduceGroups.map { FishGroup(9, it.size) }
+
+            fish = (reproduceGroups.map { FishGroup(7, it.size) } + otherGroups + newGroups)
+                .groupBy { it.timer }.map { FishGroup(it.key, it.value.sumOf(FishGroup::size)) }
+
         }
-        return fish.size
+        return fish.sumOf(FishGroup::size)
 
     }
 
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<String>): Long {
         return simulate(input.first().splitCsv(), 80)
     }
 
-    fun part2(input: List<String>): Int {
-        return simulate(input.first().splitCsv(), 255)
+    fun part2(input: List<String>): Long {
+        return simulate(input.first().splitCsv(), 256)
     }
 
     val test_input = readInput("Day06_test")
-    check(part1(test_input) == 5934)
-//    check(part2(test_input) == 5)
+    check(part1(test_input) == 5934L)
+    check(part2(test_input) == 26984457539L)
 
     val input = readInput("Day06")
     println(part1(input))
